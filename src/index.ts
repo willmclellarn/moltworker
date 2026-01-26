@@ -237,6 +237,38 @@ export default {
       });
     }
 
+    // Logs endpoint - returns container logs for debugging
+    if (url.pathname === '/logs') {
+      try {
+        const process = await findExistingClawdbotProcess(sandbox);
+        if (!process) {
+          return Response.json({
+            status: 'no_process',
+            message: 'No Clawdbot process is currently running',
+            stdout: '',
+            stderr: '',
+          });
+        }
+
+        const logs = await process.getLogs();
+        return Response.json({
+          status: 'ok',
+          process_id: process.id,
+          process_status: process.status,
+          stdout: logs.stdout || '',
+          stderr: logs.stderr || '',
+        });
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        return Response.json({
+          status: 'error',
+          message: `Failed to get logs: ${errorMessage}`,
+          stdout: '',
+          stderr: '',
+        }, { status: 500 });
+      }
+    }
+
     // Ensure Clawdbot is running
     try {
       await ensureClawdbotGateway(sandbox, env);
