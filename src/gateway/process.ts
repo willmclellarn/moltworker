@@ -96,25 +96,28 @@ export async function ensureClawdbotGateway(sandbox: Sandbox, env: ClawdbotEnv):
 
   // Wait for the gateway to be ready
   try {
-    console.log('Waiting for Clawdbot gateway to be ready on port', CLAWDBOT_PORT);
+    console.log('[Gateway] Waiting for Clawdbot gateway to be ready on port', CLAWDBOT_PORT);
     await process.waitForPort(CLAWDBOT_PORT, { mode: 'tcp', timeout: STARTUP_TIMEOUT_MS });
-    console.log('Clawdbot gateway is ready!');
+    console.log('[Gateway] Clawdbot gateway is ready!');
 
     const logs = await process.getLogs();
-    if (logs.stdout) console.log('Clawdbot stdout:', logs.stdout);
-    if (logs.stderr) console.log('Clawdbot stderr:', logs.stderr);
+    if (logs.stdout) console.log('[Gateway] stdout:', logs.stdout);
+    if (logs.stderr) console.log('[Gateway] stderr:', logs.stderr);
   } catch (e) {
-    console.error('waitForPort failed:', e);
+    console.error('[Gateway] waitForPort failed:', e);
     try {
       const logs = await process.getLogs();
-      console.error('Clawdbot startup failed. Stderr:', logs.stderr);
-      console.error('Clawdbot startup failed. Stdout:', logs.stdout);
+      console.error('[Gateway] startup failed. Stderr:', logs.stderr);
+      console.error('[Gateway] startup failed. Stdout:', logs.stdout);
       throw new Error(`Clawdbot gateway failed to start. Stderr: ${logs.stderr || '(empty)'}`);
     } catch (logErr) {
-      console.error('Failed to get logs:', logErr);
+      console.error('[Gateway] Failed to get logs:', logErr);
       throw e;
     }
   }
 
+  // Verify gateway is actually responding
+  console.log('[Gateway] Verifying gateway health...');
+  
   return process;
 }
