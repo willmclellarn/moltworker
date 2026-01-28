@@ -1,6 +1,6 @@
 import type { Sandbox } from '@cloudflare/sandbox';
 import type { MoltbotEnv } from '../types';
-import { R2_MOUNT_PATH } from '../config';
+import { R2_MOUNT_PATH, R2_BUCKET_NAME } from '../config';
 
 /**
  * Check if R2 is already mounted by looking at the mount table
@@ -47,7 +47,7 @@ export async function mountR2Storage(sandbox: Sandbox, env: MoltbotEnv): Promise
 
   try {
     console.log('Mounting R2 bucket at', R2_MOUNT_PATH);
-    await sandbox.mountBucket('moltbot-data', R2_MOUNT_PATH, {
+    await sandbox.mountBucket(R2_BUCKET_NAME, R2_MOUNT_PATH, {
       endpoint: `https://${env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com`,
       // Pass credentials explicitly since we use R2_* naming instead of AWS_*
       credentials: {
